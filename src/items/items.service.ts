@@ -3,8 +3,8 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { User } from 'src/entities/user.entity';
 import { Item } from '../entities/item.entity';
+import { User } from '../entities/user.entity';
 import { CreateItemDto } from './dto/create-item.dto';
 import { ItemStatus } from './item-status.enum';
 import { ItemRepository } from './item.repository';
@@ -13,14 +13,16 @@ import { ItemRepository } from './item.repository';
 export class ItemsService {
   constructor(private readonly itemRepository: ItemRepository) {}
 
-  private items: Item[] = [];
-
   async findAll(): Promise<Item[]> {
     return this.itemRepository.find();
   }
 
   async findById(id: string): Promise<Item | undefined> {
-    return await this.itemRepository.findOne(id);
+    const item = await this.itemRepository.findOne(id);
+    if (!item) {
+      throw new NotFoundException();
+    }
+    return item;
   }
 
   async create(createItemDto: CreateItemDto, user: User): Promise<Item> {
